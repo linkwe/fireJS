@@ -1,0 +1,38 @@
+Q('View',{
+
+    name:'v2',
+
+    items:[
+
+        {
+            
+            xtype:'Container',
+            width: Q.app.width,
+            height:Q.app.height,
+            items:[
+                {
+                    name:'i1',
+                    xtype:'Image',
+                    x:200,
+                    y:200,
+                    width: Q.app.width,
+                    height:Q.app.height,
+                    image:'a1'
+                }
+            ]
+        }
+      
+        
+    ],
+    listener:{
+        toggle:function(){
+            console.log('trigger');
+        },
+        init:function(){
+
+         
+        }
+    }
+});//.init();
+
+

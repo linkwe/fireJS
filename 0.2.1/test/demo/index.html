@@ -1,0 +1,83 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+   <meta name="viewport" />
+	<style type="text/css">body,html,canvas,div{padding: 0;margin: 0;} </style>
+</head>
+<body>
+<script src='../../src/fire.js'></script>
+<script>
+
+
+ Q('App' , {
+    resolution:1,
+    R:{
+        image:[
+            {name:'icon_home1',src:'res/icon_home1.png'},
+            {name:'icon_home2',src:'res/icon_home2.png'},
+            {name:'icon_uikit1',src:'res/icon_uikit1.png'},
+            {name:'icon_uikit2',src:'res/icon_uikit2.png'},
+
+            {name:'icon_media1',src:'res/icon_media1.png'},
+            {name:'icon_media2',src:'res/icon_media2.png'},
+
+            {name:'icon_animation1',src:'res/icon_animation1.png'},
+            {name:'icon_animation2',src:'res/icon_animation2.png'},
+
+            {name:'icon_layout1',src:'res/icon_layout1.png'},
+            {name:'icon_layout2',src:'res/icon_layout2.png'},
+            {name:'head',src:'res/head.jpg'},
+            {name:'mbg',src:'res/mbg.jpg'},
+
+            {name:'home1',src:'res/home1.jpg'},
+            {name:'home2',src:'res/home2.jpg'},
+            {name:'home3',src:'res/home3.jpg'},
+            {name:'home4',src:'res/home4.jpg'},
+            {name:'home5',src:'res/home5.jpg'},
+            {name:'ui',src:'res/ui.jpg'},
+            {name:'meiti',src:'res/meiti.jpg'},
+            {name:'layout',src:'res/layout.jpg'},
+
+            {name:'icon' ,src:'res/icon.png'},
+            {name:'icon1',src:'res/icon1.png'},
+            {name:'icon2',src:'res/icon2.png'},
+            {name:'icon3',src:'res/icon3.png'},
+            {name:'icon4',src:'res/icon4.png'},
+            {name:'icon5',src:'res/icon5.png'},
+
+       
+            {name:'meun1',src:'res/menu1.png'},
+            {name:'meun2',src:'res/menu2.png'},
+            {name:'meun3',src:'res/menu3.png'},
+            {name:'meun4',src:'res/menu4.png'},
+            {name:'meun5',src:'res/menu5.png'}
+
+
+
+            
+            // {name:'a2',src:'res/chai.png'}
+        ],
+        audio:[
+           // {name:'bg1',src:'img/bg.mp3'}
+        ],
+        require:[
+            {src:'views/v1.js'},
+            // {src:'view/v2.js'},
+            // {src:'view/v3.js'},
+            //{src:'./pixi.js-3.0.6/bin/pixi.js'}
+        ]
+    },
+    listener:{
+        init:function(){
+            
+            this.go('home');
+        },
+        loading:function(a){
+            //console.log('load:'+a.name+'--'+a.i+ '/' +a.length);
+        }
+    }
+});
+</script>
+</body>
+</html>

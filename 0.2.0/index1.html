@@ -1,0 +1,197 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+   <meta name="viewport" />
+	<style type="text/css">body,html,canvas,div{padding: 0;margin: 0;}
+
+    body{
+        background: #333;
+    }
+
+    #view{
+        width:100%;
+        height:100%;
+
+    }
+
+    </style>
+	<script src="core.js"></script>
+    <script src='debug.js'></script>
+</head>
+<body>
+
+    <div id='view'></div>
+
+<script>
+
+
+
+
+Q.require([
+    {src:'message.js',syn:true,cak:function(a){
+        Q.message = a;
+        console.log('message.js');
+    }},
+    {src:'const.js',syn:true,cak:function(a){
+        Q.fn.addOwn(Q.CONST,a);
+        console.log('const.js');
+    }},
+    {src:'utils.js',syn:true,cak:function(a){
+        Q.utils = a;
+    }},
+     {src:'Store.js',syn:true,cak:function(a){
+        Q.jsonp = a[0];
+        Q.ajax = a[1];
+        console.log('Store.js');
+
+    }},
+    {src:'BaseGraph.js',syn:true,cak:function(a){
+
+       Q.class['Point'] = a[0];
+       Q.class['Matrix'] = a[1];
+       Q.class['Rectangle'] = a[2];
+       Q.class['Circle'] = a[3];
+       Q.class['Ellipse'] = a[4];
+       Q.class['Polygon'] = a[5];
+       Q.class['RoundedRectangle'] = a[6];
+     
+       console.log('BaseGraph.js');
+
+    }},
+    {src:'texture.js',syn:true,cak:function(a){
+
+       Q.class['BaseTexture'] = a[0];
+       Q.class['TextureUvs'] = a[1];
+       Q.class['VideoBaseTexture'] = a[2];
+       Q.class['Texture'] = a[3];
+
+       console.log('texture.js');
+
+    }},
+    {src:'Renderer.js',syn:true,cak:function(a){
+
+        Q.class['SystemRenderer']=               a[0];
+        Q.class['RenderTarget']=                 a[1];
+        Q.class['WebGLManager']=                 a[2];
+        Q.class['Shader']=                       a[3];
+        Q.class['TextureShader']=                a[4];
+        Q.class['ComplexPrimitiveShader']=       a[5];
+        Q.class['PrimitiveShader']=              a[6];
+        Q.class['ShaderManager']=                a[7];
+        Q.class['AbstractFilter']=               a[8];
+        Q.class['SpriteMaskFilter']=             a[9];
+        Q.class['MaskManager']=                  a[10];
+        Q.class['StencilManager']=               a[11];
+        Q.class['BlendModeManager']=             a[12];
+        Q.class['FXAAFilter']=                   a[13];
+        Q.class['Quad']=                         a[14];
+        Q.class['FilterManager']=                a[15];
+        Q.class['WebGLRenderer']=                a[16];
+        Q.class['RenderTexture']=                a[17];
+
+       console.log('Renderer.js');
+
+    }},
+    {src:'CanvasBuffer.js',syn:true,cak:function(a){
+
+        Q.class['CanvasBuffer'] = a;
+        console.log('CanvasBuffer.js');
+    }},
+
+     {src:'CanvasRender.js',syn:true,cak:function(a){
+
+        Q.class['CanvasRenderer']    = a[0];
+        Q.class['CanvasMaskManager'] = a[1];
+        Q.class['CanvasGraphics']    = a[2];
+        console.log('CanvasRender.js');
+
+    }},
+
+
+    {src:'tween.js',syn:true,cak:function(a){
+
+        Q['Tween'] = a[0];
+        Q['pulse'] = a[1];
+        console.log('tween.js');
+
+    }},
+
+    {src:'DisplayObject.js',syn:true,cak:function(a){
+
+        Q.class['DisplayObject'] = a;
+        console.log('DisplayObject.js');
+       
+    }},
+
+    {src:'Container.js',syn:true,cak:function(a){
+
+        Q.class['Container'] = a;
+        console.log('Container.js');
+       
+    }},
+    {src:'Sprite.js',syn:true,cak:function(a){
+
+        Q.class['Sprite'] = a;
+        console.log('Sprite.js');
+       
+    }},
+    {src:'View.js',syn:true,cak:function(a){
+
+        Q.class['View'] = a;
+        console.log('View.js');
+       
+    }},
+   
+    {src:'Text.js',syn:true,cak:function(a){
+
+        Q.class['Text'] = a;
+        console.log('Text.js');
+       
+    }},
+    {src:'Image.js',syn:true,cak:function(a){
+
+        Q.class['Image'] = a;
+        console.log('Image.js');
+       
+    }},
+    {src:'BatchRender.js',syn:true,cak:function(a){
+
+        Q.class['ObjectRenderer'] =     a[0];
+        Q.class['SpriteRenderer'] =     a[1];
+        Q.class['ParticleContainer'] =  a[2];
+        Q.class['ParticleBuffer'] =     a[3];
+        Q.class['ParticleShader'] =     a[4];
+        Q.class['ParticleRenderer'] =   a[5];
+
+        console.log('BatchRender.js')
+
+    }},
+    {src:'Graphics.js',syn:true,cak:function(a){
+
+        Q.class['Graphics'] = a[0];
+        Q.class['GraphicsRenderer'] = a[1];
+        Q.class['Graphics'] = a[2];
+        console.log('Graphics.js');
+
+    }},
+    {src:'App.js',syn:true,cak:function(a){
+
+        Q.class['App'] = a;
+        console.log('App.js');
+       
+    }},{src:'loader.js',syn:true,cak:function(a){
+
+        Q['R'] = a;
+        console.log('loader.js');
+       
+    }},
+    {src:'main.js',syn:true,cak:function(a){
+
+       
+    }}
+]);
+
+</script>
+</body>
+</html>

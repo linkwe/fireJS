@@ -1,0 +1,137 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+   <meta name="viewport" />
+	
+</head>
+<body>
+
+    <div id='view'></div>
+
+<script>
+var G = window;
+var fn = {
+    $:function(a){return document.getElementById(a)},
+    define:Object.defineProperty,
+    defines:Object.defineProperties,
+    createURL:(G.URL && URL.createObjectURL.bind(URL))||(G.webkitURL && 
+    webkitURL.createObjectURL.bind(webkitURL))||G.createObjectURL,
+    revokeURL:(G.URL||G.webkitURL).revokeObjectURL,
+
+
+    now:G.Date.now,
+    isD:function(a){return a instanceof HTMLElement},
+    isS:function(a){return Object.prototype.toString.call(a) == '[object String]'},
+    isF:function(a){return Object.prototype.toString.call(a) == '[object Function]'},
+    isO:function(a){return Object.prototype.toString.call(a) == '[object Object]'},
+    isN:function(a){return Object.prototype.toString.call(a) == '[object Number]'},
+    isA:function(a){return Object.prototype.toString.call(a) == '[object Array]'},
+    getLength:function(a){var i,cont=0;for(i in a)cont++;return cont},
+    coverOwn:function(a,b){for(var i in b)a[i] = b[i];return a},
+    setOwn:function(a,b,c){for(var i in b)(a[i]!==undefined&&!fn.isF(a[i]))&&(a[i] = b[i]);return a}, 
+    coverPro:function(a,b){Object.getOwnPropertyNames(b).forEach(function(m){   
+        Object.defineProperty(a,m,Object.getOwnPropertyDescriptor(b,m))})},
+    addOwn:function(a,b){for(var i in b)a[i]===undefined&&(a[i] = b[i]);return a},
+    setCss:function (a,b){for( var i in b)a.style[i]=b[i];return a},
+    inof:function(a,b){return a instanceof (fn.isS(b)?miao.class[b]:b)},
+    inofer:function(a,b){return miao.class[b]&&miao.class[b].prototype._mproto.split(',').indexOf(a.className)!=-1},
+    inproto:function(a,b){return b.prototype._mproto.split(',').indexOf(a)!=-1},
+    getPix:function(a,b){
+        return parseFloat(a)*(/w$/.test(a)&&miao.app.width*.01||/h$/.test(a)&&miao.app.height*.01||/d$/.test(a)&&b||devicePixelRatio||1);
+    }
+};
+var _class = function( a , b , c ){
+
+    var extend =  fn.isS(a.extend) ? _class[a.extend] : a.extend;
+
+    delete a.extend;
+
+    var _o = b ? Object.defineProperties(a,b) : a , M ;
+        if(extend){
+            M =  _o.constructor !== {}.constructor ?
+                function(p){
+                    console.log(arguments,Object.prototype.toString.call(arguments));
+                    // arguments.unshift(extend);
+                    // extend.call(this,p);
+                    var s = [extend];
+                    for(var i in arguments)
+                    s.push(arguments[i]);
+
+                    _o.constructor.apply(this,s);
+
+                } : function(p){
+                    extend.call(this,p);
+                } 
+
+            c ? ( M.prototype = Object.create(extend.prototype) ) 
+            : fn.coverPro(M.prototype,extend.prototype);
+
+        }else{
+
+            M =  a.constructor !== {}.constructor ? 
+            function(p){_o.constructor.call(this,p)} : function(p){};
+        }
+
+        fn.coverPro(M.prototype,_o);
+        M.prototype._mproto = extend ? extend.prototype._mproto||'?' +
+        ','+a.className:a.className;
+        return a.className ? ( _class[a.className] = M ): M;
+};
+
+
+
+
+_class({
+    className:'AA',
+    constructor:function(a,b){
+        this.x = a ;
+        this.x1 = a ;
+    },
+    aa:function(){}
+
+});
+
+_class({
+    className:'BB',
+    extend:"AA",
+    constructor:function(_super,a,b){
+       
+        _super.call(this,a,b);
+        this.y = a ;
+        this.y1 = b;
+    },
+    bb:function(){}
+});
+
+_class({
+    className:'CC',
+    extend:"BB",
+    constructor:function(_super,a,b){
+        _super.call(this,a,b);
+        this.z = a ;
+        this.z1 = b;
+    },
+    cc:function(){}
+
+});
+
+var a = new _class.AA(1,2);
+var b = new _class.BB(3,4);
+var c = new _class.CC(5,6);
+console.log(a);
+console.log(b);
+console.log(c);
+
+// function ff(a,b){
+//     for(var i in arguments)
+//     console.log(arguments[i]);
+// }
+
+// var ss = [1,2,3,4,5];
+
+// ff.apply({},ss);
+
+</script>
+</body>
+</html>
