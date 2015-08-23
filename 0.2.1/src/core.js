@@ -27,6 +27,8 @@ var miao,g = {
 
 },
 
+_class,
+
 /** 
  * 全局常量。
  * @alias Q.CONST
@@ -448,17 +450,9 @@ fn =
 
     cset:function(a,b,n){
         if( !(this instanceof _class[n]) )return;
-
         a&&a.cover&&fn.coverOwn(this,a.cover);
-
         if(fn.isA(b)){
-            for(var i in a){
-
-                if(b.indexOf(i)==-1&&this[i]!==undefined&&!fn.isF(this[i]))this[i] = a[i];
-
-            }
-
-                
+            for(var i in a)(this[i]!==undefined&&!fn.isF(this[i]))&&(this[i] = a[i]);
             for(var j in a)if(b.indexOf(j)==-1)fn.isF(this[j])&&this[j](a[j]);
         }else{
             for(var i in a)(this[i]!==undefined&&!fn.isF(this[i]))&&(this[i] = a[i]);
@@ -498,7 +492,7 @@ fn =
      */
     clone:function (a)
     {
-
+        
         var i, k, co , type = G.toString.call(a);
         if(type === '[object Array]')
         {
@@ -907,14 +901,14 @@ fn =
         var renderer = a.renderer||this.getRenderer( a.width , a.height, { resolution:a.resolution, transparent:  false},noWebGL),
         ev = {},dom = renderer.view,mapPositionToPoint = this.mapPositionToPoint,resolution = a.resolution||1;
 
-        // dom.style.width = '100%';
-        // dom.style.height = '100%';
-        // dom.style.position = 'absolute';
-        // dom.style.top = '0px';
-        // dom.style.left = '0px';
+        dom.style.width = '100%';
+        dom.style.height = '100%';
+        dom.style.position = 'absolute';
+        dom.style.top = '0px';
+        dom.style.left = '0px';
 
-        // a.width *= a.resolution;
-        // a.height *= a.resolution;
+        a.width *= a.resolution;
+        a.height *= a.resolution;
 
 
         ev.touchDown = function(e){
@@ -1011,12 +1005,13 @@ fn =
 
         a.renderer = renderer;
 
+        miao.Transitions(renderer);
 
         a.element.appendChild(renderer.view);
 
     }
 };
-var _class;
+
 
 !function(){
 
@@ -1248,8 +1243,6 @@ message = {
 
     on:function(a,b,c,d){
 
-        if(a==miao.app&&b=='down')console.log('dsgdfgdfgdfg1');
-
         if(!fn.isS(b)||!fn.isF(c))return;
 
         var ls = a._listener = a._listener || {};
@@ -1259,7 +1252,7 @@ message = {
             ls[b] = new E({ev:c});
 
         }else{
-            if(d||!ls[b].ev){
+            if(d){
                 ls[b].ev = c;
             }else if(fn.isA(ls[b].ev)){
 
@@ -1339,9 +1332,7 @@ message = {
                 if(ls.ij.call(a,c))ret = true ;
                 if(!ret&&ls.ev)
                 if(ty&16){
-                    console.log(ls);
                     for(var i=0;i<ls.ev.length;i++){
-
                         if(ls.ev[i].call(a,c)){
                             ret= true;
                             break;
@@ -4154,7 +4145,7 @@ var SystemRenderer = _class({
         this.view = options.view || document.createElement('canvas');
         this.resolution = options.resolution;
         this.transparent = options.transparent;
-        this.autoResize = options.autoResize || true;
+        this.autoResize = options.autoResize || false;
         this.blendModes = null;
         this.preserveDrawingBuffer = options.preserveDrawingBuffer;
         this.clearBeforeRender = options.clearBeforeRender;
@@ -6509,11 +6500,8 @@ var RenderTexture = _class({
         this.render = null ;
         this.renderer = renderer ;
 
-        var uvblean;
-
         if (this.renderer.type === CONST.RENDERER_TYPE.WEBGL)
         {
-            uvblean = true;
             var gl = this.renderer.gl ;
 
             this.textureBuffer = new RenderTarget( gl , this.width, this.height, baseTexture.scaleMode, this.resolution);//, this.baseTexture.scaleMode);
@@ -6533,7 +6521,7 @@ var RenderTexture = _class({
         }
         else
         {
-            uvblean = false;
+
             this.render = this.renderCanvas;
             this.textureBuffer = new CanvasBuffer(this.width* this.resolution, this.height* this.resolution);
             this.baseTexture.source = this.textureBuffer.canvas;
@@ -6542,7 +6530,7 @@ var RenderTexture = _class({
 
         this.valid = true;
 
-        this._updateUvs(uvblean);
+        this._updateUvs(true);
     },
     resize:function (width, height, updateBase)
     {
@@ -7362,6 +7350,8 @@ var DisplayObject = _class({
 
         this._currentBounds = null;
 
+        this._cacheAsBitmap = false;
+
         this._cachedObject = null;
 
         this.position  =   new Point();
@@ -7370,7 +7360,7 @@ var DisplayObject = _class({
         this.pivot     =  new Point(0, 0);
         this.rotation  =   0;
         this.alpha     =   1;
-        this.visible   =  true;
+        this.visible  =  true;
         this.renderable =   true;
         this.enabled    =  true;
         this.depth      =  10 ;
@@ -7378,14 +7368,6 @@ var DisplayObject = _class({
         this._mask     =   null;
 
     },
-
-    _cacheAsBitmap:false,
-    _originalRenderWebGL:null,
-    _originalRenderCanvas :null,
-    _originalUpdateTransform:null,
-    _originalHitTest:null,
-    _originalDestroy:null,
-    _cachedSprite: null,
     // position:new Point(),
     // anchor:new Point(),
     // scale:new Point(1,1),
@@ -7510,6 +7492,34 @@ var DisplayObject = _class({
     },
     bind:function(n,b) {
 
+       //  if(!this._listener[n])return;
+
+       //  var root , i ;
+
+       // if(b){
+
+       //      if(!b.__listeners)return;
+       //      root = b;
+
+       //  }else{
+
+       //      if(!this.parent)return;
+
+       //      !function cha(_n){
+
+       //          if( _n.__listeners ){ 
+
+       //               root = _n;
+
+       //          }else{
+
+       //              cha( _n.parent );
+
+       //          }
+       //      }(this.parent);
+
+       //  }
+
        if(n){
 
             message.bind(this,n,b||this.parent);
@@ -7522,7 +7532,12 @@ var DisplayObject = _class({
                 message.bind(this,i,this.parent);
                 b!==false&&this.parent.addInteraction(i);
             }
+
+
        }
+
+        
+
 
         return this;
 
@@ -7669,177 +7684,23 @@ var DisplayObject = _class({
 
         this.worldTransform = null;
         this.filterArea = null;
-    },
-    _cacheAsBitmapDestroy:function ()
-    {
-        this.cacheAsBitmap = false;
-        this._originalDestroy();
-    },
-    _renderCachedWebGL:function (renderer)
-    {
-        if (!this.visible || this.worldAlpha <= 0 || !this.renderable)
-        {
-            return;
-        }
-        
-        this._initCachedDisplayObject( renderer );
-
-        renderer.setObjectRenderer(renderer.plugins.sprite);
-        renderer.plugins.sprite.render( this._cachedSprite );
-    },
-    _initCachedDisplayObject:function (renderer)
-    {
-        if(this._cachedSprite)
-        {
-            return;
-        }
-
-        // first we flush anything left in the renderer (otherwise it would get rendered to the cached texture)
-        renderer.currentRenderer.flush();
-        //this.filters= [];
-        // next we find the dimensions of the untransformed object
-        // this function also calls updatetransform on all its children as part of the measuring. This means we don't need to update the transform again in this function
-        // TODO pass an object to clone too? saves having to create a new one each time!
-        var bounds = this.getLocalBounds().clone();
-
-        // add some padding!
-        if(this._filters)
-        {
-            var padding = this._filters[0].padding;
-            bounds.x -= padding;
-            bounds.y -= padding;
-
-            bounds.width += padding * 2;
-            bounds.height += padding * 2;
-        }
-
-        // for now we cache the current renderTarget that the webGL renderer is currently using.
-        // this could be more elegent..
-        var cachedRenderTarget = renderer.currentRenderTarget;
-        // We also store the filter stack - I will definitely look to change how this works a little later down the line.
-        var stack = renderer.filterManager.filterStack;
-
-        // this renderTexture will be used to store the cached DisplayObject
-        var renderTexture = new RenderTexture(renderer, bounds.width | 0, bounds.height | 0);
-
-        // need to set //
-        var m = _tempMatrix;
-
-        m.tx = -bounds.x;
-        m.ty = -bounds.y;
-
-
-
-        // set all properties to there original so we can render to a texture
-        this.renderWebGL = this._originalRenderWebGL;
-
-        renderTexture.render(this, m, true, true);
-
-        // now restore the state be setting the new properties
-        renderer.setRenderTarget(cachedRenderTarget);
-        renderer.filterManager.filterStack = stack;
-
-        this.renderWebGL     = this._renderCachedWebGL;
-        this.updateTransform = this.displayObjectUpdateTransform;
-        this.getBounds       = this._getCachedBounds;
-
-
-        this._cachedSprite = new _class.Sprite({texture:renderTexture});
-        this._cachedSprite.worldTransform = this.worldTransform;
-        this._cachedSprite.anchor.x = -( bounds.x / bounds.width );
-        this._cachedSprite.anchor.y = -( bounds.y / bounds.height );
-
-        // restore the transform of the cached sprite to avoid the nasty flicker..
-        this.updateTransform();
-
-        // map the hit test..
-        this.containsPoint = this._cachedSprite.containsPoint.bind(this._cachedSprite);
-    },
-    _renderCachedCanvas:function (renderer)
-    {
-        if (!this.visible || this.worldAlpha <= 0 || !this.renderable)
-        {
-            return;
-        }
-        
-        this._initCachedDisplayObjectCanvas( renderer );
-
-        this._cachedSprite.worldAlpha = this.worldAlpha;
-
-        this._cachedSprite.renderCanvas(renderer);
-    },
-    _initCachedDisplayObjectCanvas:function (renderer)
-    {
-        if(this._cachedSprite)
-        {
-            return;
-        }
-
-        //get bounds actually transforms the object for us already!
-        var bounds = this.getLocalBounds();
-
-        var cachedRenderTarget = renderer.context;
-
-        var renderTexture = new RenderTexture(renderer, bounds.width | 0, bounds.height | 0);
-
-        // need to set //
-        var m = _tempMatrix;
-
-        m.tx = -bounds.x;
-        m.ty = -bounds.y;
-
-        // set all properties to there original so we can render to a texture
-        this.renderCanvas = this._originalRenderCanvas;
-
-        renderTexture.render(this, m, true);
-
-        // now restore the state be setting the new properties
-        renderer.context = cachedRenderTarget;
-
-        this.renderCanvas = this._renderCachedCanvas;
-        this.updateTransform = this.displayObjectUpdateTransform;
-        this.getBounds  = this._getCachedBounds;
-
-        console.log(this._cachedSprite);
-
-        // create our cached sprite
-        this._cachedSprite = new _class.Sprite({texture:renderTexture});
-        this._cachedSprite.worldTransform = this.worldTransform;
-        this._cachedSprite.anchor.x = -( bounds.x / bounds.width );
-        this._cachedSprite.anchor.y = -( bounds.y / bounds.height );
-        this.updateTransform();
-
-
-        this.containsPoint = this._cachedSprite.containsPoint.bind(this._cachedSprite);
-    },
-    _getCachedBounds:function ()
-    {
-        this._cachedSprite._currentBounds = null;
-
-        return this._cachedSprite.getBounds();
-    },
-    _destroyCachedDisplayObject:function ()
-    {
-        this._cachedSprite._texture.destroy();
-        this._cachedSprite = null;
     }
-
 },
 {
      id: {
-            get: function ()
-            {
-                return this._id;
-            },
-            set: function (value)
-            {
-                if(this._id){
-                    g.objCache[this._id] = null;
-                    delete g.objCache[this._id];
-                }
-                this._id = value;
-                g.objCache[value]=this;
+        get: function ()
+        {
+            return this._id;
+        },
+        set: function (value)
+        {
+            if(this._id){
+                g.objCache[this._id] = null;
+                delete g.objCache[this._id];
             }
+            this._id = value;
+            g.objCache[value]=this;
+        }
     },
     x: {
         get: function ()
@@ -7852,7 +7713,9 @@ var DisplayObject = _class({
             value = fn.getPix(value);
 
             this.position.x = value;
-        }
+        },
+        enumerable: true,
+        configurable: true
     },
 
     y: {
@@ -7865,7 +7728,9 @@ var DisplayObject = _class({
             if(typeof value === 'string')
             value = fn.getPix(value);
             this.position.y = value;
-        }
+        },
+        enumerable: true,
+        configurable: true
     },
 
     anchorX: {
@@ -7902,7 +7767,9 @@ var DisplayObject = _class({
         set: function (value)
         {
             this.scale.x = value;
-        }
+        },
+        enumerable: true,
+        configurable: true
     },
     scaleY: {
         get: function ()
@@ -7912,7 +7779,9 @@ var DisplayObject = _class({
         set: function (value)
         {
             this.scale.y = value;
-        }
+        },
+        enumerable: true,
+        configurable: true
     },
     worldVisible: {
         get: function ()
@@ -7958,61 +7827,11 @@ var DisplayObject = _class({
         {
             this._filters = value && value.slice();
         }
-    },
-    cacheAsBitmap: {
-        get: function ()
-        {
-            return this._cacheAsBitmap;
-        },
-        set: function (value)
-        {
-            if (this._cacheAsBitmap === value)
-            {
-                return;
-            }
-
-            this._cacheAsBitmap = value;
-
-            if (value)
-            {
-                this._originalRenderWebGL = this.renderWebGL;
-                this._originalRenderCanvas = this.renderCanvas;
-
-                this._originalUpdateTransform = this.updateTransform;
-                this._originalGetBounds = this.getBounds;
-
-                this._originalDestroy = this.destroy;
-
-                this._originalContainsPoint = this.containsPoint;
-
-                this.renderWebGL = this._renderCachedWebGL;
-                this.renderCanvas = this._renderCachedCanvas;
-
-                this.destroy = this._cacheAsBitmapDestroy;
-
-            }
-            else
-            {
-                if (this._cachedSprite)
-                {
-                    this._destroyCachedDisplayObject();
-                }
-
-                this.renderWebGL = this._originalRenderWebGL;
-                this.renderCanvas = this._originalRenderCanvas;
-                this.getBounds = this._originalGetBounds;
-
-                this.destroy = this._originalDestroy;
-
-                this.updateTransform = this._originalUpdateTransform;
-                this.containsPoint = this._originalContainsPoint;
-            }
-        }
     }
 });
 
-DisplayObject.prototype.displayObjectUpdateTransform = DisplayObject.prototype.updateTransform;
 
+DisplayObject.prototype.displayObjectUpdateTransform = DisplayObject.prototype.updateTransform;
 
 var cupdateTransform = function ()
 {
@@ -8153,11 +7972,7 @@ var Container = _class({
         this._items = {};
         this._width = 0;
         this._height = 0;
-
-
-        if(this instanceof Container)this.set(a);
-
-        
+        fn.cset.call(this,a,null,'Container');
     },
     // layout:CONST.LAYOUT.ABSLOUTE,
     // __layout:false,
@@ -8600,8 +8415,6 @@ var Container = _class({
                 this.children[i].destroy(destroyChildren);
             }
         }
-
-        console.log(this);
         
         this.removeChildren();
         this.children = null;
@@ -8718,33 +8531,6 @@ var Container = _class({
 
 Container.prototype.containerGetBounds = Container.prototype.getBounds;
 
-var Scrollbox = _class({
-    className:'Scrollbox',
-    extend:'Container',
-    constructor:function(_super , a){
-        _super.call(this);
-
-        this.mask = new _class.Rect({
-            x:this.x,
-            y:this.y,
-            width:this._width,
-            height:this._width
-        });
-    },
-    interaction:function(point,name,ops){ 
-        if(!this.enabled)return;
-     
-        if(this._listener&&this._listener[name]&&this.containsPoint(point)&&
-        message.trigger(this,name))return true;
-        var ax = this.children,obj;
-
-        for(var i = ax.length-1;i>=0;i--){
-            if(ax[i].interaction(miao.event.now,name,ops))
-            return true;
-        }
-    }
-});
-
 
 
 var Mesh = _class({
@@ -8816,7 +8602,7 @@ var Mesh = _class({
         this.drawMode = drawMode || Mesh.DRAW_MODES.TRIANGLE_MESH;
 
         
-        texture&&(this.texture = texture);
+        this.texture = texture;
 
     },
     _renderWebGL:function (renderer)
@@ -8828,17 +8614,11 @@ var Mesh = _class({
     {
         var context = renderer.context;
 
-        var transform = this.worldTransform,
-            resolution = renderer.resolution;
-
-        transform.a *=resolution;
-        transform.d *=resolution;
-        transform.tx *=resolution;
-        transform.ty *=resolution;
+        var transform = this.worldTransform;
 
         if (renderer.roundPixels)
         {
-            context.setTransform(transform.a, transform.b, transform.c, transform.d, transform.tx | 0, transform.ty| 0);
+            context.setTransform(transform.a, transform.b, transform.c, transform.d, transform.tx | 0, transform.ty | 0);
         }
         else
         {
@@ -8854,7 +8634,6 @@ var Mesh = _class({
             this._renderCanvasTriangles(context);
         }
     },
-
 
     /**
      * 使用canvas三角形网络
@@ -9125,213 +8904,15 @@ Mesh.DRAW_MODES = {
 _class({
     className:'ImageP',
     extend:'Mesh',
-    constructor:function( _super , a ){
-
-        var vs  = new Float32Array( 16 * 2 ),
-            uvs = new Float32Array( 16 * 2 ),
-            idx = new Uint16Array([ 0,1,4,4,1,5,1,2,5,5,2,6,2,
-                    3,6,6,3,7,4,5,8,8,5,9,5,6,
-                    9,9,6,10,6,7,10,10,7,11,8,
-                    9,12,12,9,13,9,10,13,13,10,
-                    14,10,11,14,14,11,15] );
-
-        this._aabb = a.aabb || [ 0 , 0 , 0 , 0 ];
-
-        _super.call( this , null , vs , uvs , idx , Mesh.DRAW_MODES.TRIANGLES );
-
-        if(typeof a.width === 'string')
-            a.width = fn.getPix(a.width);
-
-        if(typeof a.height === 'string')
-            a.height = fn.getPix(a.height);
-
-        this._width = a.width || 200;
-
-        this._height = a.height || 200;
-
-        this.updateVS();
-
-        fn.cset.call(this,a,['width','height','texture','aabb','image'],'ImageP');
-
-        if(a.texture){
-
-            this.texture = a.texture;
-
-            a.texture = null;
-
-            delete a.texture;
-
-        }else{
-
-            if(a.image){
-
-                var _im = fn.isS(a.image) ? miao.R.getImage( a.image ) : a.image;
-
-                this.texture = new _class.Texture(new _class.BaseTexture(_im));
-
-                a.image = null;
-                delete a.image;
-
-            }else{
-
-                this.texture = new _class.Texture(new _class.BaseTexture(new Image()));
-                this.load(a.src||CONST.DEF_IMG_SRC);
-            }
-        }
-
-    },
-    _onTextureUpdate:function ()
-    {
-        this.updateUVs();
-        this.updateFrame = true;
-    },
-
-    containsPoint:function( _point )
-    {
-        var point = this.position,
-            anchor = this.anchor,
-            scale = this.scale,
-            tw = this._width,
-            th = this._height,
-            _x = point.x - anchor.x * tw * scale.x,
-            _y = point.y - anchor.y * th * scale.y;
-
-        return !(_point.x<_x||_point.x>_x+tw*scale.x||_point.y<_y||_point.y>_y+th*scale.y);
-    },
-
-    updateUVs:function(){
-
-        var frame = this.texture._frame ,
-            uvs   = this.uvs ,
-            aabb  = this._aabb ,
-            tw    = this.texture.baseTexture.width ,
-            th    = this.texture.baseTexture.height ;
-
-        uvs[0] = frame.x / tw;
-        uvs[1] = frame.y / th;
-        uvs[2] = (frame.x + aabb[3] ) / tw;
-        uvs[3] = uvs[1];
-        uvs[4] = (frame.x + frame.width - aabb[1] ) / tw;
-        uvs[5] = uvs[1];
-        uvs[6] = (frame.x + frame.width ) / tw;
-        uvs[7] = uvs[1];
-
-        uvs[8]  = uvs[0];
-        uvs[9]  = (frame.y+aabb[0]) / th;
-        uvs[10] = uvs[2];
-        uvs[11] = uvs[9];
-        uvs[12] = uvs[4];
-        uvs[13] = uvs[9];
-        uvs[14] = uvs[6];
-        uvs[15] = uvs[9];
-
-        uvs[16] = uvs[0];
-        uvs[17] = (frame.y + frame.height - aabb[2]) / th;
-        uvs[18] = uvs[2];
-        uvs[19] = uvs[17];
-        uvs[20] = uvs[4];
-        uvs[21] = uvs[17];
-        uvs[22] = uvs[6];
-        uvs[23] = uvs[17];
-
-        uvs[24] = uvs[0];
-        uvs[25] = (frame.y+frame.height) / th;
-        uvs[26] = uvs[2];
-        uvs[27] = uvs[25];
-        uvs[28] = uvs[4];
-        uvs[29] = uvs[25];
-        uvs[30] = uvs[6];
-        uvs[31] = uvs[25];
-
-    },
-
-    updateVS:function(){
-        var aabb = this._aabb,
-
-            vs = this.vertices,
-           
-            x0 = 0,
-            x1 = aabb[3],
-            x2 = this._width - aabb[1],
-            x3 = this._width,
-
-            y0 = 0,
-            y1 = aabb[0],
-            y2 = this._height - aabb[2],
-            y3 = this._height;
-
-        vs[0] = x0;
-        vs[1] = y0;
-        vs[2] = x1;
-        vs[3] = y0;
-        vs[4] = x2;
-        vs[5] = y0;
-        vs[6] = x3;
-        vs[7] = y0;
-
-        vs[8] = x0;
-        vs[9] = y1;
-        vs[10] = x1;
-        vs[11] = y1;
-        vs[12] = x2;
-        vs[13] = y1;
-        vs[14] = x3;
-        vs[15] = y1;
-
-        vs[16] = x0;
-        vs[17] = y2;
-        vs[18] = x1;
-        vs[19] = y2;
-        vs[20] = x2;
-        vs[21] = y2;
-        vs[22] = x3;
-        vs[23] = y2;
-
-        vs[24] = x0;
-        vs[25] = y3;
-        vs[26] = x1;
-        vs[27] = y3;
-        vs[28] = x2;
-        vs[29] = y3;
-        vs[30] = x3;
-        vs[31] = y3;
-
-    },
-    // _renderWebGL:function (renderer)
-    // {
-    //     renderer.setObjectRenderer(renderer.plugins.mesh);
-    //     renderer.plugins.mesh.render(this);
-    // },
-    // _renderCanvas:function (renderer)
-    // {
-    //     var context = renderer.context;
-
-    //     var transform = this.worldTransform;
-
-    //     if (renderer.roundPixels)
-    //     {
-    //         context.setTransform(transform.a, transform.b, transform.c, transform.d, transform.tx | 0, transform.ty | 0);
-    //     }
-    //     else
-    //     {
-    //         context.setTransform(transform.a*2, transform.b, transform.c, transform.d*2, transform.tx*2, transform.ty*2);
-    //     }
-
-    //     if (this.drawMode === Mesh.DRAW_MODES.TRIANGLE_MESH)
-    //     {
-    //         this._renderCanvasTriangleMesh(context);
-    //     }
-    //     else
-    //     {
-    //         this._renderCanvasTriangles(context);
-    //     }
-    // }
+    constructor:function(_super){
+        this._aabb = null ;
+        // _super.call(this,)
+    }
 },{
-
     aabb: {
         get: function ()
         {
-            return this._aabb;
+            return this.pivot.x / this._width;
         },
         set: function (value)
         {
@@ -9345,8 +8926,7 @@ _class({
             }else{
                 this._aabb = [0,0,0,0];
             }
-            this.updateUVs();
-            this.updateVS();
+            
         },
         enumerable: true,
         configurable: true
@@ -9359,7 +8939,6 @@ _class({
         set: function (value)
         {
             this.pivot.x = value * this._width;
-            this.anchor.x = value;
         },
         enumerable: true,
         configurable: true
@@ -9372,40 +8951,35 @@ _class({
         },
         set: function (value)
         {
-            this.pivot.y = value * this._height;
-            this.anchor.y = value;
+            this.anchor.y = value * this._height;
         },
         enumerable: true,
         configurable: true
-
     },
     width: {
         get: function ()
         {
+
             return this._width;
+            return this.scale.x * this.getLocalBounds().width;
         },
         set: function (value)
         {
+
             if(typeof value === 'string')
             value = fn.getPix(value);
-           
-            var x2 = value - this._aabb[1],
-                x3 = value,
-                vs = this.vertices;
-            
-            vs[4] = x2;
-            vs[6] = x3;
+            console.log('set',value);
+            var width = this.getLocalBounds().width;
 
-            vs[12] = x2;
-            vs[14] = x3;
+            if (width !== 0)
+            {
+                this.scale.x = value / width;
+            }
+            else
+            {
+                this.scale.x = 1;
+            }
 
-            vs[20] = x2;
-            vs[22] = x3;
-
-            vs[28] = x2;
-            vs[30] = x3;
-
-            this.pivot.x = this.anchor.x * value;
 
             this._width = value;
         },
@@ -9417,27 +8991,23 @@ _class({
         get: function ()
         {
             return  this._height;
+            return  this.scale.y * this.getLocalBounds().height;
         },
         set: function (value)
         {
             if(typeof value === 'string')
             value = fn.getPix(value);
 
-            var y2 = value - this._aabb[1],
-                y3 = value,
-                vs = this.vertices;
+            var height = this.getLocalBounds().height;
 
-            vs[17] = y2;
-            vs[19] = y2;
-            vs[21] = y2;
-            vs[23] = y2;
-
-            vs[25] = y3;
-            vs[27] = y3;
-            vs[29] = y3;
-            vs[31] = y3;
-
-            this.pivot.y = this.anchor.y * value;
+            if (height !== 0)
+            {
+                this.scale.y = value / height ;
+            }
+            else
+            {
+                this.scale.y = 1;
+            }
 
             this._height = value;
         },
@@ -9446,6 +9016,8 @@ _class({
     }
 });
 
+
+*/
 
 var CanvasTinter = {
 
@@ -9638,6 +9210,8 @@ var Sprite, _Image = Sprite = _class({
 
         this.adapt = ''; //类型
 
+        
+
         if(a.texture){
 
             this.texture = a.texture;
@@ -9664,7 +9238,10 @@ var Sprite, _Image = Sprite = _class({
             }
         }
 
-        if(this instanceof _Image)this.set(a);
+
+        // if(this instanceof _Image)this.set(a);
+
+        fn.cset.call(this,a,[''],'Image');
 
     },
     load:function(url){
@@ -9690,7 +9267,6 @@ var Sprite, _Image = Sprite = _class({
         }
     },
     auto:function(a){
-
 
         if(a.w && typeof a.w === 'string')
             a.w = fn.getPix(a.w);
@@ -10091,7 +9667,7 @@ var Sprite, _Image = Sprite = _class({
         },
         set: function (value)
         {
-           
+
             if (this._texture === value)
             {
                 return;
@@ -11029,8 +10605,6 @@ var MeshRenderer = _class({
     {
         var gl = this.renderer.gl;
 
-        console.log(mesh);
-
         mesh._vertexBuffer = gl.createBuffer();
         mesh._indexBuffer = gl.createBuffer();
         mesh._uvBuffer = gl.createBuffer();
@@ -11043,11 +10617,11 @@ var MeshRenderer = _class({
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh._uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,  mesh.uvs, gl.STATIC_DRAW);
 
-        // if(mesh.colors){
-        //     mesh._colorBuffer = gl.createBuffer();
-        //     gl.bindBuffer(gl.ARRAY_BUFFER, mesh._colorBuffer);
-        //     gl.bufferData(gl.ARRAY_BUFFER, mesh.colors, gl.STATIC_DRAW);
-        // }
+        if(mesh.colors){
+            mesh._colorBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, mesh._colorBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, mesh.colors, gl.STATIC_DRAW);
+        }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.indices, gl.STATIC_DRAW);
@@ -14436,15 +14010,13 @@ miao.R = loader;
 }();
 
 
-miao.Transitions = function(renderer,w,h,r){
+miao.Transitions = function(renderer){
 
-var _r1 = new CanvasRenderer(w,h,{resolution:r});
-var _r2 = new CanvasRenderer(w,h,{resolution:r});
 
-var ren = renderer;
+// var renderer = renderer;
 
-var trnA = new RenderTexture(ren,w,h,null,r);
-var trnB = new RenderTexture(ren,w,h,null,r);
+var trnA = new RenderTexture(renderer);
+var trnB = new RenderTexture(renderer);
 
 // var imA = new _Image({texture:trnA});
 // var imB = new _Image({texture:trnB});
@@ -14751,24 +14323,19 @@ var App = _class({
 
         this.resolution = a.resolution || 1;
 
-        var _w,_h;
-
         if(a.element){
 
             this.element = a.element;
-            _w = this.element.clientWidth;
-            _h = this.element.clientHeight;
+            this.width  = this.element.clientWidth;
+            this.height = this.element.clientHeight;
 
         }else{
 
             this.element = document.body;
-            _w = document.documentElement.clientWidth;
-            _h = document.documentElement.clientHeight;
+            this.width  = document.documentElement.clientWidth;
+            this.height = document.documentElement.clientHeight;
 
         }
-
-        this.width  = _w;//this.resolution * _w ;
-        this.height = _h;//this.resolution * _h ;
 
         this.atyView = new _class.View();
 
@@ -14829,9 +14396,7 @@ var App = _class({
             // message.trigger(this.atyView,'up');
         });
 
-        utils.setRenderer(this,a.noWebGL);
-
-        miao.Transitions(this.renderer,this.width,this.height,this.resolution);
+        utils.setRenderer(this);
 
         this.renderer.backgroundColor = 0x000000;
 
@@ -14937,6 +14502,7 @@ var App = _class({
         }
     }
 });
+
 
 
 return miao;

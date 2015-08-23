@@ -11,16 +11,14 @@
 
 
  Q('App' , {
-    resolution:1,
+    noWebGL:true,
+    // resolution:.5,
     R:{
         image:[
-            
             {name:'photo1',src:'res/1.jpeg'},
             {name:'photo2',src:'res/2.jpeg'},
             {name:'pp',src:'res/pp.png'}
-
         ],
-       
         require:[
             {src:'views/v1.js'},
             {src:'views/v2.js'}
@@ -30,9 +28,11 @@
         init:function(){
             this.go('v1');
         },
-        loading:function(a){
-            console.log('load:'+a.name+'--'+a.i+ '/' +a.length);
-        }
+        // down:function (argument) {
+        //     console.log('app')
+        //     // body...
+        // },
+        loading:function(a){}
     }
 });
 </script>
